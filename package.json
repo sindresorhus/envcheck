@@ -1,0 +1,38 @@
+{
+  "name": "envcheck",
+  "version": "0.0.0",
+  "description": "Environment checker for @addyosmani",
+  "license": "MIT",
+  "bin": {
+    "envcheck": "cli.js"
+  },
+  "repository": "sindresorhus/envcheck",
+  "author": {
+    "name": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "http://sindresorhus.com"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "files": [
+    "index.js"
+  ],
+  "keywords": [
+    "env",
+    "environment",
+    "check",
+    "detect"
+  ],
+  "devDependencies": {
+    "mocha": "*"
+  },
+  "dependencies": {
+    "which": "~1.0.5",
+    "chalk": "~0.4.0",
+    "each-async": "~0.1.1"
+  }
+}
