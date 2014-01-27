@@ -1,6 +1,9 @@
 'use strict';
+var execFile = require('child_process').execFile;
 var which = require('which');
 var eachAsync = require('each-async');
+var semver = require('semver');
+
 var checks = [];
 
 
@@ -35,6 +38,51 @@ function binaryCheck(binary, title, message, cb) {
 
 	checks.push(function binaries(cb) {
 		binaryCheck(el, title, null, cb);
+	});
+});
+
+checks.push(function home(cb) {
+	var win = process.platform === 'win32';
+	var home = win ? process.env.USERPROFILE : process.env.HOME;
+
+	cb(null, {
+		title: (win ? '%USERPROFILE' : '$HOME'),
+		message: !home && 'path variable is not set. This is required to know where your home directory is. Follow this guide: https://github.com/sindresorhus/guides/blob/master/set-environment-variables.md',
+		fail: !home
+	});
+});
+
+checks.push(function nodeVersion(cb) {
+	execFile('node', ['--version'], function (err, stdout) {
+		if (err) {
+			return cb(err);
+		}
+
+		var version = stdout.trim();
+		var pass = semver.satisfies(version, '>=0.10.0');
+
+		cb(null, {
+			title: 'Node.js version',
+			message: !pass && version + ' is outdated. Please update: http://nodejs.org',
+			fail: !pass
+		});
+	});
+});
+
+checks.push(function npmVersion(cb) {
+	execFile('npm', ['--version'], function (err, stdout) {
+		if (err) {
+			return cb(err);
+		}
+
+		var version = stdout.trim();
+		var pass = semver.satisfies(version, '>=1.3.10');
+
+		cb(null, {
+			title: 'npm version',
+			message: !pass && version + ' is outdated. Please update by running: npm update --global npm',
+			fail: !pass
+		});
 	});
 });
 
