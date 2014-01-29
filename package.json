@@ -19,7 +19,8 @@
     "test": "mocha"
   },
   "files": [
-    "index.js"
+    "index.js",
+    "cli.js"
   ],
   "keywords": [
     "env",
