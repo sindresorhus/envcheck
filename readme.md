@@ -1,6 +1,9 @@
 # envcheck [![Build Status](https://travis-ci.org/sindresorhus/envcheck.png?branch=master)](http://travis-ci.org/sindresorhus/envcheck)
 
-> Environment checker for @addyosmani
+> [Yeoman](http://yeoman.io) environment checker
+
+Makes sure you have the dependencies you'll usually need when using Yeoman.
+
 
 ![](screenshot.png)
 
