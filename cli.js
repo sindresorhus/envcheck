@@ -16,11 +16,16 @@ envcheck(function (err, results) {
 		throw err;
 	}
 
+	var fail = false;
+
 	console.log(chalk.underline('\nEnvironment check\n') + results.map(function (el) {
 		if (el.fail) {
+			fail = true;
 			return chalk.red('✘ ' + el.title) + (el.message ? ' - ' + el.message : '');
 		}
 
 		return chalk.green('✔ ' + el.title) + (el.message ? ' - ' + el.message : '');
 	}).join('\n'));
+
+	process.exit(fail ? 1 : 0);
 });
