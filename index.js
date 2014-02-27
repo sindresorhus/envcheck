@@ -3,17 +3,19 @@ var execFile = require('child_process').execFile;
 var which = require('which');
 var eachAsync = require('each-async');
 var semver = require('semver');
-
 var checks = [];
 
+function binaryCheck(bin, opts, cb) {
+	opts = opts || {};
 
-function binaryCheck(binary, title, message, cb) {
-	which(binary, function (err) {
+	var title = opts.title || bin[0].toUpperCase() + bin.slice(1);
+
+	which(bin, function (err) {
 		if (err) {
 			if (/not found/.test(err.message)) {
 				return cb(null, {
 					title: title,
-					message: message || 'Could not find ' + title,
+					message: opts.message || 'Could not find ' + opts.title,
 					fail: true
 				});
 			}
@@ -27,17 +29,14 @@ function binaryCheck(binary, title, message, cb) {
 	});
 }
 
-
 [
 	'ruby',
 	'compass',
 	'git',
 	'yo'
 ].forEach(function (el) {
-	var title = el[0].toUpperCase() + el.slice(1);
-
 	checks.push(function binaries(cb) {
-		binaryCheck(el, title, null, cb);
+		binaryCheck(el, null, cb);
 	});
 });
 
@@ -52,7 +51,17 @@ checks.push(function home(cb) {
 	});
 });
 
-checks.push(function nodeVersion(cb) {
+checks.push(function node(cb) {
+	try {
+		which.sync('node');
+	} catch (err) {
+		return cb(null, {
+			title: 'Node.js',
+			message: 'Not installed. Please install from http://nodejs.org',
+			fail: true
+		});
+	}
+
 	execFile('node', ['--version'], function (err, stdout) {
 		if (err) {
 			return cb(err);
@@ -62,14 +71,24 @@ checks.push(function nodeVersion(cb) {
 		var pass = semver.satisfies(version, '>=0.10.0');
 
 		cb(null, {
-			title: 'Node.js version',
+			title: 'Node.js',
 			message: !pass && version + ' is outdated. Please update: http://nodejs.org',
 			fail: !pass
 		});
 	});
 });
 
-checks.push(function npmVersion(cb) {
+checks.push(function npm(cb) {
+	try {
+		which.sync('npm');
+	} catch (err) {
+		return cb(null, {
+			title: 'npm',
+			message: 'Not installed. Please install Node.js (which bundles npm) from http://nodejs.org',
+			fail: true
+		});
+	}
+
 	execFile('npm', ['--version'], function (err, stdout) {
 		if (err) {
 			return cb(err);
@@ -79,26 +98,12 @@ checks.push(function npmVersion(cb) {
 		var pass = semver.satisfies(version, '>=1.3.10');
 
 		cb(null, {
-			title: 'npm version',
+			title: 'npm',
 			message: !pass && version + ' is outdated. Please update by running: npm update --global npm',
 			fail: !pass
 		});
 	});
 });
-
-/*
-Example:
-
-checks.push(function (cb) {
-	// do something here
-
-	cb(null, {
-		title: 'Binary',
-		message: 'Foo',
-		fail: true
-	});
-});
-*/
 
 module.exports = function (cb) {
 	var results = [];
