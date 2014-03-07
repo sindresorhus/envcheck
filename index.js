@@ -15,7 +15,7 @@ function binaryCheck(bin, opts, cb) {
 			if (/not found/.test(err.message)) {
 				return cb(null, {
 					title: title,
-					message: opts.message || 'Could not find ' + opts.title,
+					message: opts.message || 'not found',
 					fail: true
 				});
 			}
@@ -45,15 +45,15 @@ checks.push(function home(cb) {
 	var home = win ? process.env.USERPROFILE : process.env.HOME;
 
 	cb(null, {
-		title: (win ? '%USERPROFILE' : '$HOME'),
-		message: !home && 'path variable is not set. This is required to know where your home directory is. Follow this guide: https://github.com/sindresorhus/guides/blob/master/set-environment-variables.md',
+		title: win ? '%USERPROFILE' : '$HOME',
+		message: !home && 'environment variable is not set. This is required to know where your home directory is. Follow this guide: https://github.com/sindresorhus/guides/blob/master/set-environment-variables.md',
 		fail: !home
 	});
 });
 
 checks.push(function node(cb) {
 	try {
-		which.sync('node');
+		var bin = which.sync('node');
 	} catch (err) {
 		return cb(null, {
 			title: 'Node.js',
@@ -62,7 +62,7 @@ checks.push(function node(cb) {
 		});
 	}
 
-	execFile('node', ['--version'], function (err, stdout) {
+	execFile(bin, ['--version'], function (err, stdout) {
 		if (err) {
 			return cb(err);
 		}
@@ -80,7 +80,7 @@ checks.push(function node(cb) {
 
 checks.push(function npm(cb) {
 	try {
-		which.sync('npm');
+		var bin = which.sync('npm');
 	} catch (err) {
 		return cb(null, {
 			title: 'npm',
@@ -89,7 +89,7 @@ checks.push(function npm(cb) {
 		});
 	}
 
-	execFile('npm', ['--version'], function (err, stdout) {
+	execFile(bin, ['--version'], function (err, stdout) {
 		if (err) {
 			return cb(err);
 		}

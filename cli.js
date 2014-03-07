@@ -2,6 +2,7 @@
 'use strict';
 var chalk = require('chalk');
 var envcheck = require('./index');
+var isWin = process.platform === 'win32';
 
 if (process.argv.indexOf('-h') !== -1 || process.argv.indexOf('--help') !== -1) {
 	return console.log('Usage\n  ' + chalk.blue('envcheck') + '\n\nRuns checks against the environment');
@@ -21,10 +22,10 @@ envcheck(function (err, results) {
 	console.log(chalk.underline('\nEnvironment check\n') + results.map(function (el) {
 		if (el.fail) {
 			fail = true;
-			return chalk.red('✘ ') + el.title + (el.message ? ' - ' + el.message : '');
+			return chalk.red(isWin ? '× ' : '✘ ') + el.title + (el.message ? ' - ' + el.message : '');
 		}
 
-		return chalk.green('✔ ') + el.title + (el.message ? ' - ' + el.message : '');
+		return chalk.green(isWin ? '√ ' : '✔ ') + el.title + (el.message ? ' - ' + el.message : '');
 	}).join('\n'));
 
 	process.exit(fail ? 1 : 0);

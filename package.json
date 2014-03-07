@@ -1,7 +1,7 @@
 {
   "name": "envcheck",
   "version": "0.2.2",
-  "description": "Environment checker for @addyosmani",
+  "description": "Yeoman environment checker",
   "license": "MIT",
   "bin": {
     "envcheck": "cli.js"
@@ -26,15 +26,19 @@
     "env",
     "environment",
     "check",
-    "detect"
+    "detect",
+    "yeoman",
+    "yo",
+    "doctor",
+    "diagnose"
   ],
+  "dependencies": {
+    "which": "^1.0.5",
+    "chalk": "^0.4.0",
+    "each-async": "^0.1.1",
+    "semver": "^2.2.1"
+  },
   "devDependencies": {
     "mocha": "*"
-  },
-  "dependencies": {
-    "which": "~1.0.5",
-    "chalk": "~0.4.0",
-    "each-async": "~0.1.1",
-    "semver": "~2.2.1"
   }
 }
