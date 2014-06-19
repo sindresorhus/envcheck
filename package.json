@@ -1,6 +1,6 @@
 {
   "name": "envcheck",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Yeoman environment checker",
   "license": "MIT",
   "bin": {
