@@ -52,17 +52,7 @@ checks.push(function home(cb) {
 });
 
 checks.push(function node(cb) {
-	try {
-		var bin = which.sync('node');
-	} catch (err) {
-		return cb(null, {
-			title: 'Node.js',
-			message: 'Not installed. Please install from http://nodejs.org',
-			fail: true
-		});
-	}
-
-	execFile(bin, ['--version'], function (err, stdout) {
+	execFile('node', ['--version'], function (err, stdout) {
 		if (err) {
 			return cb(err);
 		}
