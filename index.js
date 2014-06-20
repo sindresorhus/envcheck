@@ -52,7 +52,7 @@ checks.push(function home(cb) {
 });
 
 checks.push(function node(cb) {
-	execFile('node', ['--version'], function (err, stdout) {
+	execFile(process.execPath, ['--version'], function (err, stdout) {
 		if (err) {
 			return cb(err);
 		}
