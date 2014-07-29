@@ -1,15 +1,28 @@
 #!/usr/bin/env node
 'use strict';
 var chalk = require('chalk');
-var envcheck = require('./index');
-var isWin = process.platform === 'win32';
+var logSymbols = require('log-symbols');
+var argv = require('minimist')(process.argv.slice(2));
+var pkg = require('./package.json');
+var envcheck = require('./');
 
-if (process.argv.indexOf('-h') !== -1 || process.argv.indexOf('--help') !== -1) {
-	return console.log('Usage\n  ' + chalk.blue('envcheck') + '\n\nRuns checks against the environment');
+function help() {
+	console.log([
+		pkg.description,
+		'',
+		'Usage',
+		'  $ envcheck'
+	].join('\n'));
 }
 
-if (process.argv.indexOf('-v') !== -1 || process.argv.indexOf('--version') !== -1) {
-	return console.log(require('./package').version);
+if (argv.help) {
+	help();
+	return;
+}
+
+if (argv.version) {
+	console.log(pkg.version);
+	return;
 }
 
 envcheck(function (err, results) {
@@ -22,10 +35,10 @@ envcheck(function (err, results) {
 	console.log(chalk.underline('\nEnvironment check\n') + results.map(function (el) {
 		if (el.fail) {
 			fail = true;
-			return chalk.red(isWin ? '× ' : '✘ ') + el.title + (el.message ? ' - ' + el.message : '');
+			return logSymbols.error + ' ' + el.title + (el.message ? ' - ' + el.message : '');
 		}
 
-		return chalk.green(isWin ? '√ ' : '✔ ') + el.title + (el.message ? ' - ' + el.message : '');
+		return logSymbols.success + ' ' + el.title + (el.message ? ' - ' + el.message : '');
 	}).join('\n'));
 
 	process.exit(fail ? 1 : 0);

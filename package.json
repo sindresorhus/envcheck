@@ -35,6 +35,8 @@
   "dependencies": {
     "chalk": "^0.5.1",
     "each-async": "^0.1.1",
+    "log-symbols": "^1.0.0",
+    "minimist": "^0.2.0",
     "semver": "^3.0.1",
     "which": "^1.0.5"
   },
