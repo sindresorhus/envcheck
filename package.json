@@ -33,10 +33,10 @@
     "diagnose"
   ],
   "dependencies": {
-    "which": "^1.0.5",
-    "chalk": "^0.4.0",
+    "chalk": "^0.5.1",
     "each-async": "^0.1.1",
-    "semver": "^2.2.1"
+    "semver": "^3.0.1",
+    "which": "^1.0.5"
   },
   "devDependencies": {
     "mocha": "*"
