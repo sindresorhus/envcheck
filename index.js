@@ -3,6 +3,7 @@ var execFile = require('child_process').execFile;
 var which = require('which');
 var eachAsync = require('each-async');
 var semver = require('semver');
+var userHome = require('user-home');
 var checks = [];
 
 function binaryCheck(bin, opts, cb) {
@@ -41,13 +42,10 @@ function binaryCheck(bin, opts, cb) {
 });
 
 checks.push(function home(cb) {
-	var win = process.platform === 'win32';
-	var home = win ? process.env.USERPROFILE : process.env.HOME;
-
 	cb(null, {
-		title: win ? '%USERPROFILE' : '$HOME',
-		message: !home && 'environment variable is not set. This is required to know where your home directory is. Follow this guide: https://github.com/sindresorhus/guides/blob/master/set-environment-variables.md',
-		fail: !home
+		title: process.platform === 'win32' ? '%USERPROFILE' : '$HOME',
+		message: !userHome && 'environment variable is not set. This is required to know where your home directory is. Follow this guide: https://github.com/sindresorhus/guides/blob/master/set-environment-variables.md',
+		fail: !userHome
 	});
 });
 

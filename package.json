@@ -38,6 +38,7 @@
     "log-symbols": "^1.0.0",
     "minimist": "^0.2.0",
     "semver": "^3.0.1",
+    "user-home": "^1.0.0",
     "which": "^1.0.5"
   },
   "devDependencies": {
