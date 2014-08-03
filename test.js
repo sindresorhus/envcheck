@@ -1,14 +1,15 @@
 'use strict';
-var assert = require('assert');
-var envcheck = require('./index');
+var test = require('ava');
+var envcheck = require('./');
 
-it('should detect git', function (cb) {
+test('should detect git', function (t) {
+	t.plan(1);
+
 	envcheck(function (err, results) {
-		assert(results.some(function (el) {
+		t.assert(results.some(function (el) {
 			if (el.title === 'Git' && !el.fail) {
 				return true;
 			}
 		}));
-		cb();
 	});
 });
