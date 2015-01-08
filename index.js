@@ -17,7 +17,7 @@ function binaryCheck(bin, opts, cb) {
 			if (/not found/.test(err.message)) {
 				return cb(null, {
 					title: title,
-					message: opts.message || 'not found',
+					message: opts.message || 'Not installed',
 					fail: true
 				});
 			}
@@ -34,8 +34,7 @@ function binaryCheck(bin, opts, cb) {
 [
 	'ruby',
 	'compass',
-	'git',
-	'yo'
+	'git'
 ].forEach(function (el) {
 	checks.push(function binaries(cb) {
 		binaryCheck(el, null, cb);
@@ -92,7 +91,39 @@ checks.push(function npm(cb) {
 
 			cb(null, {
 				title: 'npm',
-				message: !pass && version + ' is outdated. Please update by running: npm install --global npm',
+				message: !pass && localVersion + ' is outdated. Please update by running: npm install --global npm',
+				fail: !pass
+			});
+		});
+	});
+});
+
+checks.push(function yo(cb) {
+	var bin;
+
+	try {
+		bin = which.sync('yo');
+	} catch (err) {
+		return cb(null, {
+			title: 'yo',
+			message: 'Not installed. Please install it by running: npm install --global yo',
+			fail: true
+		});
+	}
+
+	execFile(bin, ['--version'], function (err, stdout) {
+		if (err) {
+			return cb(err);
+		}
+
+		var localVersion = stdout.trim();
+
+		latestVersion('yo', function (err, version) {
+			var pass = semver.satisfies(localVersion, version);
+
+			cb(null, {
+				title: 'yo',
+				message: !pass && localVersion + ' is outdated. Please update by running: npm install --global yo',
 				fail: !pass
 			});
 		});
