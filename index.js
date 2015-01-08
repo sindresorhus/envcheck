@@ -4,6 +4,7 @@ var which = require('which');
 var eachAsync = require('each-async');
 var semver = require('semver');
 var userHome = require('user-home');
+var latestVersion = require('latest-version');
 var checks = [];
 
 function binaryCheck(bin, opts, cb) {
@@ -67,8 +68,10 @@ checks.push(function node(cb) {
 });
 
 checks.push(function npm(cb) {
+	var bin;
+
 	try {
-		var bin = which.sync('npm');
+		bin = which.sync('npm');
 	} catch (err) {
 		return cb(null, {
 			title: 'npm',
@@ -82,13 +85,16 @@ checks.push(function npm(cb) {
 			return cb(err);
 		}
 
-		var version = stdout.trim();
-		var pass = semver.satisfies(version, '>=1.3.10');
+		var localVersion = stdout.trim();
 
-		cb(null, {
-			title: 'npm',
-			message: !pass && version + ' is outdated. Please update by running: npm update --global npm',
-			fail: !pass
+		latestVersion('npm', function (err, version) {
+			var pass = semver.satisfies(localVersion, version);
+
+			cb(null, {
+				title: 'npm',
+				message: !pass && version + ' is outdated. Please update by running: npm install --global npm',
+				fail: !pass
+			});
 		});
 	});
 });
