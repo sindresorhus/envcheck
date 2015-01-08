@@ -5,6 +5,7 @@ var eachAsync = require('each-async');
 var semver = require('semver');
 var userHome = require('user-home');
 var latestVersion = require('latest-version');
+var sortOn = require('sort-on');
 var checks = [];
 
 function binaryCheck(bin, opts, cb) {
@@ -143,6 +144,6 @@ module.exports = function (cb) {
 			next();
 		});
 	}, function (err) {
-		cb(err, results);
+		cb(err, sortOn(results, 'fail'));
 	});
 };

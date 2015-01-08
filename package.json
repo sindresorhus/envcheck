@@ -39,6 +39,7 @@
     "log-symbols": "^1.0.0",
     "minimist": "^1.1.0",
     "semver": "^4.0.3",
+    "sort-on": "^1.0.0",
     "user-home": "^1.0.0",
     "which": "^1.0.5"
   },
