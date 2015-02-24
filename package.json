@@ -33,7 +33,7 @@
     "diagnose"
   ],
   "dependencies": {
-    "chalk": "^0.5.1",
+    "chalk": "^1.0.0",
     "each-async": "^1.1.0",
     "latest-version": "^1.0.0",
     "log-symbols": "^1.0.0",
