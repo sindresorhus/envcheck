@@ -3,15 +3,13 @@
   "version": "1.2.1",
   "description": "Yeoman environment checker",
   "license": "MIT",
-  "bin": {
-    "envcheck": "cli.js"
-  },
   "repository": "sindresorhus/envcheck",
   "author": {
     "name": "Sindre Sorhus",
     "email": "sindresorhus@gmail.com",
-    "url": "http://sindresorhus.com"
+    "url": "sindresorhus.com"
   },
+  "bin": "cli.js",
   "engines": {
     "node": ">=0.10.0"
   },
@@ -23,6 +21,8 @@
     "cli.js"
   ],
   "keywords": [
+    "cli-app",
+    "cli",
     "env",
     "environment",
     "check",
