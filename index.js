@@ -16,19 +16,19 @@ function binaryCheck(bin, opts, cb) {
 	which(bin, function (err) {
 		if (err) {
 			if (/not found/.test(err.message)) {
-				return cb(null, {
+				cb(null, {
 					title: title,
 					message: opts.message || 'Not installed',
 					fail: true
 				});
+				return;
 			}
 
-			return cb(err);
+			cb(err);
+			return;
 		}
 
-		cb(null, {
-			title: title
-		});
+		cb(null, {title: title});
 	});
 }
 
@@ -45,7 +45,11 @@ function binaryCheck(bin, opts, cb) {
 checks.push(function home(cb) {
 	cb(null, {
 		title: process.platform === 'win32' ? '%USERPROFILE' : '$HOME',
-		message: !userHome && 'environment variable is not set. This is required to know where your home directory is. Follow this guide: https://github.com/sindresorhus/guides/blob/master/set-environment-variables.md',
+		message: !userHome && [
+			'environment variable is not set. This is required to know where',
+			'your home directory is. Follow this guide:',
+			'https://github.com/sindresorhus/guides/blob/master/set-environment-variables.md'
+		].join(' '),
 		fail: !userHome
 	});
 });
@@ -53,7 +57,8 @@ checks.push(function home(cb) {
 checks.push(function node(cb) {
 	execFile(process.execPath, ['--version'], function (err, stdout) {
 		if (err) {
-			return cb(err);
+			cb(err);
+			return;
 		}
 
 		var version = stdout.trim();
@@ -73,16 +78,18 @@ checks.push(function npm(cb) {
 	try {
 		bin = which.sync('npm');
 	} catch (err) {
-		return cb(null, {
+		cb(null, {
 			title: 'npm',
 			message: 'Not installed. Please install Node.js (which bundles npm) from http://nodejs.org',
 			fail: true
 		});
+		return;
 	}
 
 	execFile(bin, ['--version'], function (err, stdout) {
 		if (err) {
-			return cb(err);
+			cb(err);
+			return;
 		}
 
 		var localVersion = stdout.trim();
@@ -105,16 +112,18 @@ checks.push(function yo(cb) {
 	try {
 		bin = which.sync('yo');
 	} catch (err) {
-		return cb(null, {
+		cb(null, {
 			title: 'yo',
 			message: 'Not installed. Please install it by running: npm install --global yo',
 			fail: true
 		});
+		return;
 	}
 
 	execFile(bin, ['--version'], function (err, stdout) {
 		if (err) {
-			return cb(err);
+			cb(err);
+			return;
 		}
 
 		var localVersion = stdout.trim();
@@ -137,7 +146,8 @@ module.exports = function (cb) {
 	eachAsync(checks, function (el, i, next) {
 		el(function (err, result) {
 			if (err) {
-				return next(err);
+				next(err);
+				return;
 			}
 
 			results.push(result);

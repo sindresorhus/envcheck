@@ -14,7 +14,8 @@ meow({
 
 envcheck(function (err, results) {
 	if (err) {
-		throw err;
+		console.error(err.message);
+		process.exit(2);
 	}
 
 	var fail = false;

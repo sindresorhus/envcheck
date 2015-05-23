@@ -9,14 +9,14 @@ Makes sure you have the dependencies you'll usually need when using Yeoman.
 
 ## Install
 
-```sh
+```
 $ npm install --global envcheck
 ```
 
 
 ## Usage
 
-```sh
+```
 $ envcheck
 ```
 
