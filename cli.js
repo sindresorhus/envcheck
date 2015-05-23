@@ -1,29 +1,16 @@
 #!/usr/bin/env node
 'use strict';
+var meow = require('meow');
 var chalk = require('chalk');
 var logSymbols = require('log-symbols');
-var argv = require('minimist')(process.argv.slice(2));
-var pkg = require('./package.json');
 var envcheck = require('./');
 
-function help() {
-	console.log([
-		pkg.description,
-		'',
+meow({
+	help: [
 		'Usage',
 		'  $ envcheck'
-	].join('\n'));
-}
-
-if (argv.help) {
-	help();
-	return;
-}
-
-if (argv.version) {
-	console.log(pkg.version);
-	return;
-}
+	].join('\n')
+});
 
 envcheck(function (err, results) {
 	if (err) {
