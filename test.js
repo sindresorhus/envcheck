@@ -1,15 +1,10 @@
-'use strict';
-var test = require('ava');
-var envcheck = require('./');
+import test from 'ava';
+import fn from './';
 
-test('should detect git', function (t) {
+test('should detect git', t => {
 	t.plan(1);
 
-	envcheck(function (err, results) {
-		t.assert(results.some(function (el) {
-			if (el.title === 'Git' && !el.fail) {
-				return true;
-			}
-		}));
+	fn((_, results) => {
+		t.true(results.some(x => x.title === 'Git' && !x.fail));
 	});
 });

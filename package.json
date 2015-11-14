@@ -14,7 +14,7 @@
     "node": ">=0.10.0"
   },
   "scripts": {
-    "test": "node test.js"
+    "test": "xo && ava"
   },
   "files": [
     "index.js",
@@ -35,15 +35,16 @@
   "dependencies": {
     "chalk": "^1.0.0",
     "each-async": "^1.1.0",
-    "latest-version": "^1.0.0",
+    "latest-version": "^2.0.0",
     "log-symbols": "^1.0.0",
     "meow": "^3.1.0",
-    "semver": "^4.0.3",
+    "semver": "^5.0.3",
     "sort-on": "^1.0.0",
-    "user-home": "^1.0.0",
+    "user-home": "^2.0.0",
     "which": "^1.0.5"
   },
   "devDependencies": {
-    "ava": "0.0.4"
+    "ava": "*",
+    "xo": "*"
   }
 }

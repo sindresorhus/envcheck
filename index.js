@@ -94,7 +94,7 @@ checks.push(function npm(cb) {
 
 		var localVersion = stdout.trim();
 
-		latestVersion('npm', function (err, version) {
+		latestVersion('npm').then(function (version) {
 			var pass = semver.satisfies(localVersion, version);
 
 			cb(null, {
@@ -128,7 +128,7 @@ checks.push(function yo(cb) {
 
 		var localVersion = stdout.trim();
 
-		latestVersion('yo', function (err, version) {
+		latestVersion('yo').then(function (version) {
 			var pass = semver.satisfies(localVersion, version);
 
 			cb(null, {
