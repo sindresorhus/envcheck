@@ -1,20 +1,28 @@
 import test from 'ava';
 import m from './';
 
-test('should detect git', async t => {
+test('detect git', async t => {
 	const results = await m();
 	t.true(results.some(x => x.title === 'Git' && !x.fail));
 });
 
 if (process.env.CI) {
-	test('should not detect yo', async t => {
+	test('do not detect yo', async t => {
 		const results = await m();
-
-		console.log(results);
 
 		t.deepEqual(results.find(x => x.title === 'yo'), {
 			title: 'yo',
-			message: 'Not installed. Please install it by running: npm install --global yo',
+			message: 'Not installed. Please install it by running: npm install -g yo',
+			fail: true
+		});
+	});
+
+	test('do not detect compass', async t => {
+		const results = await m();
+
+		t.deepEqual(results.find(x => x.title === 'Compass'), {
+			title: 'Compass',
+			message: 'Not installed',
 			fail: true
 		});
 	});
