@@ -1,32 +1,29 @@
 #!/usr/bin/env node
 'use strict';
-var meow = require('meow');
-var chalk = require('chalk');
-var logSymbols = require('log-symbols');
-var envcheck = require('./');
+const meow = require('meow');
+const chalk = require('chalk');
+const logSymbols = require('log-symbols');
+const envcheck = require('./');
 
-meow({
-	help: [
-		'Usage',
-		'  $ envcheck'
-	].join('\n')
-});
+meow(`
+	Usage
+	  $ envcheck
+`);
 
-envcheck(function (err, results) {
-	if (err) {
-		console.error(err.message);
-		process.exit(2);
-	}
+envcheck().then(results => {
+	let fail = false;
 
-	var fail = false;
+	console.log(chalk.underline('\nEnvironment check'));
+	console.log(results.map(x => {
+		let symbol = logSymbols.success;
+		const message = x.message ? ` - ${x.message}` : '';
 
-	console.log(chalk.underline('\nEnvironment check\n') + results.map(function (el) {
-		if (el.fail) {
+		if (x.fail) {
+			symbol = logSymbols.error;
 			fail = true;
-			return logSymbols.error + ' ' + el.title + (el.message ? ' - ' + el.message : '');
 		}
 
-		return logSymbols.success + ' ' + el.title + (el.message ? ' - ' + el.message : '');
+		return `${symbol} ${x.title}${message}`;
 	}).join('\n'));
 
 	process.exit(fail ? 1 : 0);
