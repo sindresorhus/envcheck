@@ -6,6 +6,7 @@ const latestVersion = require('latest-version');
 const sortOn = require('sort-on');
 const execa = require('execa');
 const pify = require('pify');
+const redent = require('redent');
 
 const whichP = pify(which);
 
@@ -68,11 +69,11 @@ const binaryVersionCheck = bin => {
 
 const home = {
 	title: process.platform === 'win32' ? '%USERPROFILE' : '$HOME',
-	message: !userHome && [
-		'environment constiable is not set. This is required to know where',
-		'your home directory is. Follow this guide:',
-		'https://github.com/sindresorhus/guides/blob/master/set-environment-constiables.md'
-	].join(' '),
+	message: !userHome && redent(`
+		environment constiable is not set. This is required to know where
+		your home directory is. Follow this guide:
+		https://github.com/sindresorhus/guides/blob/master/set-environment-constiables.md
+	`),
 	fail: !userHome
 };
 
