@@ -6,7 +6,6 @@ const latestVersion = require('latest-version');
 const sortOn = require('sort-on');
 const execa = require('execa');
 const pify = require('pify');
-const checks = [];
 
 const whichP = pify(which);
 
@@ -67,14 +66,6 @@ const binaryVersionCheck = bin => {
 		});
 };
 
-[
-	'ruby',
-	'compass',
-	'git'
-].forEach(x => {
-	checks.push(binaryCheck(x, null));
-});
-
 const home = {
 	title: process.platform === 'win32' ? '%USERPROFILE' : '$HOME',
 	message: !userHome && [
@@ -98,6 +89,12 @@ const node = execa.stdout('node', ['--version']).then(stdout => {
 
 const npm = binaryVersionCheck('npm');
 const yo = binaryVersionCheck('yo');
+
+const checks = [
+	'ruby',
+	'compass',
+	'git'
+].map(x => binaryCheck(x));
 
 checks.push(home, node, npm, yo);
 
