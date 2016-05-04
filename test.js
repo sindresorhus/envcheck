@@ -10,7 +10,7 @@ if (process.env.CI) {
 	test('do not detect yo', async t => {
 		const results = await m();
 
-		t.deepEqual(results.find(x => x.title === 'yo'), {
+		t.deepEqual(results.find(x => x.title === 'Yo'), {
 			title: 'yo',
 			message: 'Not installed. Please install it by running: npm install -g yo',
 			fail: true

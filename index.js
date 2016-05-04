@@ -8,11 +8,12 @@ const execa = require('execa');
 const pify = require('pify');
 
 const whichP = pify(which);
+const uppercase = str => str[0].toUpperCase() + str.slice(1);
 
 const binaryCheck = (bin, opts) => {
 	opts = opts || {};
 
-	const title = opts.title || bin[0].toUpperCase() + bin.slice(1);
+	const title = opts.title || uppercase(bin);
 
 	return whichP(bin)
 		.then(() => ({title, fail: false}))
@@ -30,26 +31,24 @@ const binaryCheck = (bin, opts) => {
 };
 
 const binaryVersionCheck = bin => {
-	const title = bin;
-	const message = `Not installed. Please install it by running: npm install -g ${bin}`;
+	const title = uppercase(bin);
 
-	return execa.stdout(bin, ['--version'])
-		.then(localVersion => {
-			return latestVersion(bin).then(version => {
-				const pass = semver.satisfies(localVersion, version);
+	return whichP(bin)
+		.then(() => execa.stdout(bin, ['--version']))
+		.then(localVersion => latestVersion(bin).then(version => {
+			const pass = semver.satisfies(localVersion, version);
 
-				return {
-					title,
-					message: !pass && `${localVersion} is outdated. Please update by running: npm install -g ${bin}`,
-					fail: !pass
-				};
-			});
-		})
+			return {
+				title,
+				message: !pass && `${localVersion} is outdated. Please update by running: npm install -g ${bin}`,
+				fail: !pass
+			};
+		}))
 		.catch(err => {
-			if (/ENOENT/.test(err.message)) {
+			if (/not found/.test(err.message)) {
 				return {
 					title,
-					message,
+					message: `Not installed. Please install it by running: npm install -g ${bin}`,
 					fail: true
 				};
 			}
