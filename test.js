@@ -11,7 +11,7 @@ if (process.env.CI) {
 		const results = await m();
 
 		t.deepEqual(results.find(x => x.title === 'Yo'), {
-			title: 'yo',
+			title: 'Yo',
 			message: 'Not installed. Please install it by running: npm install -g yo',
 			fail: true
 		});
