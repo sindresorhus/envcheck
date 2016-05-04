@@ -6,7 +6,6 @@ const latestVersion = require('latest-version');
 const sortOn = require('sort-on');
 const execa = require('execa');
 const pify = require('pify');
-const redent = require('redent');
 
 const whichP = pify(which);
 
@@ -16,12 +15,7 @@ const binaryCheck = (bin, opts) => {
 	const title = opts.title || bin[0].toUpperCase() + bin.slice(1);
 
 	return whichP(bin)
-		.then(() => {
-			return {
-				title,
-				fail: false
-			};
-		})
+		.then(() => ({title, fail: false}))
 		.catch(err => {
 			if (/not found/.test(err.message)) {
 				return {
@@ -37,25 +31,22 @@ const binaryCheck = (bin, opts) => {
 
 const binaryVersionCheck = bin => {
 	const title = bin;
-	const message = `Not installed. Please install it by running: npm install --global ${bin}`;
+	const message = `Not installed. Please install it by running: npm install -g ${bin}`;
 
-	return whichP(bin)
-		.then(() => execa.stdout(bin, ['--version']))
-		.then(stdout => {
-			const localVersion = stdout.trim();
-
+	return execa.stdout(bin, ['--version'])
+		.then(localVersion => {
 			return latestVersion(bin).then(version => {
 				const pass = semver.satisfies(localVersion, version);
 
 				return {
 					title,
-					message: !pass && `${localVersion} is outdated. Please update by running: npm install --global ${bin}`,
+					message: !pass && `${localVersion} is outdated. Please update by running: npm install -g ${bin}`,
 					fail: !pass
 				};
 			});
 		})
 		.catch(err => {
-			if (/not found/.test(err.message)) {
+			if (/ENOENT/.test(err.message)) {
 				return {
 					title,
 					message,
@@ -69,17 +60,12 @@ const binaryVersionCheck = bin => {
 
 const home = {
 	title: process.platform === 'win32' ? '%USERPROFILE' : '$HOME',
-	message: !userHome && redent(`
-		environment constiable is not set. This is required to know where
-		your home directory is. Follow this guide:
-		https://github.com/sindresorhus/guides/blob/master/set-environment-constiables.md
-	`),
+	message: !userHome && 'Environment variable is not set. This is required to know where your home directory is. Follow this guide: https://github.com/sindresorhus/guides/blob/master/set-environment-variables.md',
 	fail: !userHome
 };
 
-const node = execa.stdout('node', ['--version']).then(stdout => {
-	const version = stdout.trim();
-	const pass = semver.satisfies(version, '>=0.10.0');
+const node = execa.stdout('node', ['--version']).then(version => {
+	const pass = semver.satisfies(version, '>=4');
 
 	return {
 		title: 'Node.js',
