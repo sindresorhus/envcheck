@@ -10,52 +10,32 @@ const pify = require('pify');
 const whichP = pify(which);
 const uppercase = str => str[0].toUpperCase() + str.slice(1);
 
-const binaryCheck = (bin, opts) => {
-	opts = opts || {};
-
-	const title = opts.title || uppercase(bin);
-
-	return whichP(bin)
-		.then(() => ({title, fail: false}))
-		.catch(err => {
-			if (/not found/.test(err.message)) {
-				return {
-					title,
-					message: opts.message || 'Not installed',
-					fail: true
-				};
-			}
-
-			throw err;
-		});
-};
-
-const binaryVersionCheck = bin => {
-	const title = uppercase(bin);
-
-	return whichP(bin)
-		.then(() => execa.stdout(bin, ['--version']))
-		.then(localVersion => latestVersion(bin).then(version => {
-			const pass = semver.satisfies(localVersion, version);
-
+const binaryCheck = (bin, opts) => whichP(bin)
+	.then(() => ({title: uppercase(bin), fail: false}))
+	.catch(err => {
+		if (/not found/.test(err.message)) {
 			return {
-				title,
-				message: !pass && `${localVersion} is outdated. Please update by running: npm install -g ${bin}`,
-				fail: !pass
+				title: uppercase(bin),
+				message: opts && opts.message || 'Not installed',
+				fail: true
 			};
-		}))
-		.catch(err => {
-			if (/not found/.test(err.message)) {
-				return {
-					title,
-					message: `Not installed. Please install it by running: npm install -g ${bin}`,
-					fail: true
-				};
-			}
+		}
 
-			throw err;
-		});
-};
+		throw err;
+	});
+
+const versionCheck = bin => execa.stdout(bin, ['--version'])
+	.then(localVersion => latestVersion(bin).then(version => {
+		const pass = semver.satisfies(localVersion, version);
+
+		return {
+			title: uppercase(bin),
+			message: !pass && `${localVersion} is outdated. Please update by running: npm install -g ${bin}`,
+			fail: !pass
+		};
+	}));
+
+const binaryVersionCheck = bin => binaryCheck(bin, {message: `Not installed. Please install it by running: npm install -g ${bin}`}).then(res => res.fail ? res : versionCheck(bin));
 
 const home = {
 	title: process.platform === 'win32' ? '%USERPROFILE' : '$HOME',
@@ -73,15 +53,14 @@ const node = execa.stdout('node', ['--version']).then(version => {
 	};
 });
 
-const npm = binaryVersionCheck('npm');
-const yo = binaryVersionCheck('yo');
-
 const checks = [
-	'ruby',
-	'compass',
-	'git'
-].map(x => binaryCheck(x));
-
-checks.push(home, node, npm, yo);
+	binaryCheck('ruby'),
+	binaryCheck('compass'),
+	binaryCheck('git'),
+	home,
+	node,
+	binaryVersionCheck('npm'),
+	binaryVersionCheck('yo')
+];
 
 module.exports = () => Promise.all(checks).then(results => sortOn(results, 'fail'));
