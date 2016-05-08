@@ -11,7 +11,7 @@
   },
   "bin": "cli.js",
   "engines": {
-    "node": ">=0.10.0"
+    "node": ">=4"
   },
   "scripts": {
     "test": "xo && ava"
@@ -34,10 +34,11 @@
   ],
   "dependencies": {
     "chalk": "^1.0.0",
-    "each-async": "^1.1.0",
+    "execa": "^0.4.0",
     "latest-version": "^2.0.0",
     "log-symbols": "^1.0.0",
     "meow": "^3.1.0",
+    "pify": "^2.3.0",
     "semver": "^5.0.3",
     "sort-on": "^1.0.0",
     "user-home": "^2.0.0",
@@ -46,5 +47,8 @@
   "devDependencies": {
     "ava": "*",
     "xo": "*"
+  },
+  "xo": {
+    "esnext": true
   }
 }

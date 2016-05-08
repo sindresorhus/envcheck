@@ -1,159 +1,66 @@
 'use strict';
-var execFile = require('child_process').execFile;
-var which = require('which');
-var eachAsync = require('each-async');
-var semver = require('semver');
-var userHome = require('user-home');
-var latestVersion = require('latest-version');
-var sortOn = require('sort-on');
-var checks = [];
+const which = require('which');
+const semver = require('semver');
+const userHome = require('user-home');
+const latestVersion = require('latest-version');
+const sortOn = require('sort-on');
+const execa = require('execa');
+const pify = require('pify');
 
-function binaryCheck(bin, opts, cb) {
-	opts = opts || {};
+const whichP = pify(which);
+const uppercase = str => str[0].toUpperCase() + str.slice(1);
 
-	var title = opts.title || bin[0].toUpperCase() + bin.slice(1);
-
-	which(bin, function (err) {
-		if (err) {
-			if (/not found/.test(err.message)) {
-				cb(null, {
-					title: title,
-					message: opts.message || 'Not installed',
-					fail: true
-				});
-				return;
-			}
-
-			cb(err);
-			return;
+const binaryCheck = (bin, opts) => whichP(bin)
+	.then(() => ({title: uppercase(bin), fail: false}))
+	.catch(err => {
+		if (/not found/.test(err.message)) {
+			return {
+				title: uppercase(bin),
+				message: opts && opts.message || 'Not installed',
+				fail: true
+			};
 		}
 
-		cb(null, {title: title});
+		throw err;
 	});
-}
 
-[
-	'ruby',
-	'compass',
-	'git'
-].forEach(function (el) {
-	checks.push(function binaries(cb) {
-		binaryCheck(el, null, cb);
-	});
-});
+const versionCheck = bin => execa.stdout(bin, ['--version'])
+	.then(localVersion => latestVersion(bin).then(version => {
+		const pass = semver.satisfies(localVersion, version);
 
-checks.push(function home(cb) {
-	cb(null, {
-		title: process.platform === 'win32' ? '%USERPROFILE' : '$HOME',
-		message: !userHome && [
-			'environment variable is not set. This is required to know where',
-			'your home directory is. Follow this guide:',
-			'https://github.com/sindresorhus/guides/blob/master/set-environment-variables.md'
-		].join(' '),
-		fail: !userHome
-	});
-});
-
-checks.push(function node(cb) {
-	execFile(process.execPath, ['--version'], function (err, stdout) {
-		if (err) {
-			cb(err);
-			return;
-		}
-
-		var version = stdout.trim();
-		var pass = semver.satisfies(version, '>=0.10.0');
-
-		cb(null, {
-			title: 'Node.js',
-			message: !pass && version + ' is outdated. Please update: http://nodejs.org',
+		return {
+			title: uppercase(bin),
+			message: !pass && `${localVersion} is outdated. Please update by running: npm install -g ${bin}`,
 			fail: !pass
-		});
-	});
-});
+		};
+	}));
 
-checks.push(function npm(cb) {
-	var bin;
+const binaryVersionCheck = bin => binaryCheck(bin, {message: `Not installed. Please install it by running: npm install -g ${bin}`}).then(res => res.fail ? res : versionCheck(bin));
 
-	try {
-		bin = which.sync('npm');
-	} catch (err) {
-		cb(null, {
-			title: 'npm',
-			message: 'Not installed. Please install Node.js (which bundles npm) from http://nodejs.org',
-			fail: true
-		});
-		return;
-	}
-
-	execFile(bin, ['--version'], function (err, stdout) {
-		if (err) {
-			cb(err);
-			return;
-		}
-
-		var localVersion = stdout.trim();
-
-		latestVersion('npm').then(function (version) {
-			var pass = semver.satisfies(localVersion, version);
-
-			cb(null, {
-				title: 'npm',
-				message: !pass && localVersion + ' is outdated. Please update by running: npm install --global npm',
-				fail: !pass
-			});
-		});
-	});
-});
-
-checks.push(function yo(cb) {
-	var bin;
-
-	try {
-		bin = which.sync('yo');
-	} catch (err) {
-		cb(null, {
-			title: 'yo',
-			message: 'Not installed. Please install it by running: npm install --global yo',
-			fail: true
-		});
-		return;
-	}
-
-	execFile(bin, ['--version'], function (err, stdout) {
-		if (err) {
-			cb(err);
-			return;
-		}
-
-		var localVersion = stdout.trim();
-
-		latestVersion('yo').then(function (version) {
-			var pass = semver.satisfies(localVersion, version);
-
-			cb(null, {
-				title: 'yo',
-				message: !pass && localVersion + ' is outdated. Please update by running: npm install --global yo',
-				fail: !pass
-			});
-		});
-	});
-});
-
-module.exports = function (cb) {
-	var results = [];
-
-	eachAsync(checks, function (el, i, next) {
-		el(function (err, result) {
-			if (err) {
-				next(err);
-				return;
-			}
-
-			results.push(result);
-			next();
-		});
-	}, function (err) {
-		cb(err, sortOn(results, 'fail'));
-	});
+const home = {
+	title: process.platform === 'win32' ? '%USERPROFILE' : '$HOME',
+	message: !userHome && 'Environment variable is not set. This is required to know where your home directory is. Follow this guide: https://github.com/sindresorhus/guides/blob/master/set-environment-variables.md',
+	fail: !userHome
 };
+
+const node = execa.stdout('node', ['--version']).then(version => {
+	const pass = semver.satisfies(version, '>=4');
+
+	return {
+		title: 'Node.js',
+		message: !pass && `${version} is outdated. Please update: http://nodejs.org`,
+		fail: !pass
+	};
+});
+
+const checks = [
+	binaryCheck('ruby'),
+	binaryCheck('compass'),
+	binaryCheck('git'),
+	home,
+	node,
+	binaryVersionCheck('npm'),
+	binaryVersionCheck('yo')
+];
+
+module.exports = () => Promise.all(checks).then(results => sortOn(results, 'fail'));
