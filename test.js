@@ -16,14 +16,4 @@ if (process.env.CI) {
 			fail: true
 		});
 	});
-
-	test('do not detect compass', async t => {
-		const results = await m();
-
-		t.deepEqual(results.find(x => x.title === 'Compass'), {
-			title: 'Compass',
-			message: 'Not installed',
-			fail: true
-		});
-	});
 }

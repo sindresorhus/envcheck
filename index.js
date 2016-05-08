@@ -54,8 +54,6 @@ const node = execa.stdout('node', ['--version']).then(version => {
 });
 
 const checks = [
-	binaryCheck('ruby'),
-	binaryCheck('compass'),
 	binaryCheck('git'),
 	home,
 	node,
