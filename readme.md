@@ -1,4 +1,4 @@
-# envcheck [![Build Status](https://travis-ci.org/sindresorhus/envcheck.svg?branch=master)](https://travis-ci.org/sindresorhus/envcheck)
+# envcheck
 
 > [Yeoman](http://yeoman.io) environment checker
 
